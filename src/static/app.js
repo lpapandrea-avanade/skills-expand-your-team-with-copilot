@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Theme toggle elements
   const themeToggle = document.getElementById("theme-toggle");
   const themeIcon = themeToggle.querySelector(".theme-icon");
-  const themeText = themeToggle.querySelector("span:nth-child(2)");
+  const themeText = themeToggle.querySelector(".theme-text");
 
   // Initialize theme
   function initializeTheme() {
