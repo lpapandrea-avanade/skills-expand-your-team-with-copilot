@@ -34,6 +34,13 @@ document.addEventListener("DOMContentLoaded", () => {
     technology: { label: "Technology", color: "#e8eaf6", textColor: "#3949ab" },
   };
 
+  // Helper function to escape HTML to prevent XSS
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
   // State for activities and filters
   let allActivities = {};
   let currentFilter = "all";
@@ -552,6 +559,23 @@ document.addEventListener("DOMContentLoaded", () => {
             .join("")}
         </ul>
       </div>
+      <div class="share-container">
+        <div class="share-label">Share this activity:</div>
+        <div class="share-buttons">
+          <button class="share-button twitter" data-share="twitter" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}">
+            🐦 Twitter
+          </button>
+          <button class="share-button facebook" data-share="facebook" data-activity="${escapeHtml(name)}">
+            📘 Facebook
+          </button>
+          <button class="share-button email" data-share="email" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}" data-schedule="${escapeHtml(formattedSchedule)}">
+            📧 Email
+          </button>
+          <button class="share-button copy" data-share="copy">
+            🔗 Copy Link
+          </button>
+        </div>
+      </div>
       <div class="activity-card-actions">
         ${
           currentUser
@@ -575,6 +599,32 @@ document.addEventListener("DOMContentLoaded", () => {
     const deleteButtons = activityCard.querySelectorAll(".delete-participant");
     deleteButtons.forEach((button) => {
       button.addEventListener("click", handleUnregister);
+    });
+
+    // Add click handlers for share buttons
+    const shareButtons = activityCard.querySelectorAll(".share-button");
+    shareButtons.forEach((button) => {
+      button.addEventListener("click", (e) => {
+        const shareType = e.currentTarget.dataset.share;
+        const activityName = e.currentTarget.dataset.activity;
+        const description = e.currentTarget.dataset.description;
+        const schedule = e.currentTarget.dataset.schedule;
+
+        switch (shareType) {
+          case 'twitter':
+            shareOnTwitter(activityName, description);
+            break;
+          case 'facebook':
+            shareOnFacebook(activityName);
+            break;
+          case 'email':
+            shareViaEmail(activityName, description, schedule);
+            break;
+          case 'copy':
+            copyLinkToClipboard(e.currentTarget);
+            break;
+        }
+      });
     });
 
     // Add click handler for register button (only when authenticated)
@@ -854,6 +904,55 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error signing up:", error);
     }
   });
+
+  // Social sharing functions
+  function shareOnTwitter(activityName, description) {
+    const text = `Check out this activity at Mergington High School: ${activityName} - ${description}`;
+    const url = encodeURIComponent(window.location.href);
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${url}`;
+    window.open(twitterUrl, '_blank', 'width=550,height=420');
+  }
+
+  function shareOnFacebook(activityName) {
+    const url = encodeURIComponent(window.location.href);
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+    window.open(facebookUrl, '_blank', 'width=550,height=420');
+  }
+
+  function shareViaEmail(activityName, description, schedule) {
+    const subject = encodeURIComponent(`Mergington High School Activity: ${activityName}`);
+    const body = encodeURIComponent(`Check out this extracurricular activity at Mergington High School:\n\n${activityName}\n${description}\n\nSchedule: ${schedule}\n\nView details at: ${window.location.href}`);
+    const mailtoUrl = `mailto:?subject=${subject}&body=${body}`;
+    
+    // Use an anchor element to avoid navigating away from the page
+    const link = document.createElement('a');
+    link.href = mailtoUrl;
+    link.click();
+  }
+
+  function copyLinkToClipboard(button) {
+    const url = window.location.href;
+    
+    // Check if clipboard API is available
+    if (!navigator.clipboard) {
+      showMessage('Clipboard sharing is not available in your browser. Please copy the link manually.', 'error');
+      return;
+    }
+    
+    navigator.clipboard.writeText(url).then(() => {
+      const originalText = button.textContent;
+      button.textContent = '✓ Copied!';
+      button.classList.add('copied');
+      
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.classList.remove('copied');
+      }, 2000);
+    }).catch(err => {
+      console.error('Failed to copy link:', err);
+      showMessage('Failed to copy link to clipboard', 'error');
+    });
+  }
 
   // Expose filter functions to window for future UI control
   window.activityFilters = {
