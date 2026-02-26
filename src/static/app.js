@@ -27,45 +27,52 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Theme toggle elements
   const themeToggle = document.getElementById("theme-toggle");
-  const themeIcon = themeToggle.querySelector(".theme-icon");
-  const themeText = themeToggle.querySelector(".theme-text");
+  
+  // Initialize theme only if theme toggle exists
+  if (themeToggle) {
+    const themeIcon = themeToggle.querySelector(".theme-icon");
+    const themeText = themeToggle.querySelector(".theme-text");
 
-  // Initialize theme
-  function initializeTheme() {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") {
-      document.body.classList.add("dark-mode");
-      themeIcon.textContent = "☀️";
-      themeText.textContent = "Light Mode";
-      themeToggle.setAttribute("aria-pressed", "true");
-    } else {
-      document.body.classList.remove("dark-mode");
-      themeIcon.textContent = "🌙";
-      themeText.textContent = "Dark Mode";
-      themeToggle.setAttribute("aria-pressed", "false");
+    // Initialize theme
+    function initializeTheme() {
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme === "dark") {
+        document.body.classList.add("dark-mode");
+        if (themeIcon) themeIcon.textContent = "☀️";
+        if (themeText) themeText.textContent = "Light Mode";
+        themeToggle.setAttribute("aria-pressed", "true");
+      } else {
+        document.body.classList.remove("dark-mode");
+        if (themeIcon) themeIcon.textContent = "🌙";
+        if (themeText) themeText.textContent = "Dark Mode";
+        themeToggle.setAttribute("aria-pressed", "false");
+      }
     }
-  }
 
-  // Toggle theme
-  function toggleTheme() {
-    document.body.classList.toggle("dark-mode");
-    const isDarkMode = document.body.classList.contains("dark-mode");
+    // Toggle theme
+    function toggleTheme() {
+      document.body.classList.toggle("dark-mode");
+      const isDarkMode = document.body.classList.contains("dark-mode");
+      
+      if (isDarkMode) {
+        if (themeIcon) themeIcon.textContent = "☀️";
+        if (themeText) themeText.textContent = "Light Mode";
+        themeToggle.setAttribute("aria-pressed", "true");
+        localStorage.setItem("theme", "dark");
+      } else {
+        if (themeIcon) themeIcon.textContent = "🌙";
+        if (themeText) themeText.textContent = "Dark Mode";
+        themeToggle.setAttribute("aria-pressed", "false");
+        localStorage.setItem("theme", "light");
+      }
+    }
+
+    // Event listener for theme toggle
+    themeToggle.addEventListener("click", toggleTheme);
     
-    if (isDarkMode) {
-      themeIcon.textContent = "☀️";
-      themeText.textContent = "Light Mode";
-      themeToggle.setAttribute("aria-pressed", "true");
-      localStorage.setItem("theme", "dark");
-    } else {
-      themeIcon.textContent = "🌙";
-      themeText.textContent = "Dark Mode";
-      themeToggle.setAttribute("aria-pressed", "false");
-      localStorage.setItem("theme", "light");
-    }
+    // Initialize theme on page load
+    initializeTheme();
   }
-
-  // Event listener for theme toggle
-  themeToggle.addEventListener("click", toggleTheme);
 
   // Activity categories with corresponding colors
   const activityTypes = {
@@ -904,7 +911,6 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Initialize app
-  initializeTheme();
   checkAuthentication();
   initializeFilters();
   fetchActivities();
