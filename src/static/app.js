@@ -34,6 +34,13 @@ document.addEventListener("DOMContentLoaded", () => {
     technology: { label: "Technology", color: "#e8eaf6", textColor: "#3949ab" },
   };
 
+  // Helper function to escape HTML to prevent XSS
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
   // State for activities and filters
   let allActivities = {};
   let currentFilter = "all";
@@ -555,13 +562,13 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="share-container">
         <div class="share-label">Share this activity:</div>
         <div class="share-buttons">
-          <button class="share-button twitter" data-share="twitter" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}">
+          <button class="share-button twitter" data-share="twitter" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}">
             🐦 Twitter
           </button>
-          <button class="share-button facebook" data-share="facebook" data-activity="${name}">
+          <button class="share-button facebook" data-share="facebook" data-activity="${escapeHtml(name)}">
             📘 Facebook
           </button>
-          <button class="share-button email" data-share="email" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}" data-schedule="${formattedSchedule.replace(/"/g, '&quot;')}">
+          <button class="share-button email" data-share="email" data-activity="${escapeHtml(name)}" data-description="${escapeHtml(details.description)}" data-schedule="${escapeHtml(formattedSchedule)}">
             📧 Email
           </button>
           <button class="share-button copy" data-share="copy">
@@ -598,10 +605,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const shareButtons = activityCard.querySelectorAll(".share-button");
     shareButtons.forEach((button) => {
       button.addEventListener("click", (e) => {
-        const shareType = e.target.dataset.share;
-        const activityName = e.target.dataset.activity;
-        const description = e.target.dataset.description;
-        const schedule = e.target.dataset.schedule;
+        const shareType = e.currentTarget.dataset.share;
+        const activityName = e.currentTarget.dataset.activity;
+        const description = e.currentTarget.dataset.description;
+        const schedule = e.currentTarget.dataset.schedule;
 
         switch (shareType) {
           case 'twitter':
@@ -614,7 +621,7 @@ document.addEventListener("DOMContentLoaded", () => {
             shareViaEmail(activityName, description, schedule);
             break;
           case 'copy':
-            copyLinkToClipboard(e.target);
+            copyLinkToClipboard(e.currentTarget);
             break;
         }
       });
@@ -913,14 +920,21 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function shareViaEmail(activityName, description, schedule) {
-    const subject = encodeURIComponent(`Check out this activity: ${activityName}`);
-    const body = encodeURIComponent(`I thought you might be interested in this activity at Mergington High School:\n\n${activityName}\n${description}\n\nSchedule: ${schedule}\n\nLearn more at: ${window.location.href}`);
+    const subject = encodeURIComponent(`Mergington High School Activity: ${activityName}`);
+    const body = encodeURIComponent(`Check out this extracurricular activity at Mergington High School:\n\n${activityName}\n${description}\n\nSchedule: ${schedule}\n\nView details at: ${window.location.href}`);
     const mailtoUrl = `mailto:?subject=${subject}&body=${body}`;
     window.location.href = mailtoUrl;
   }
 
   function copyLinkToClipboard(button) {
     const url = window.location.href;
+    
+    // Check if clipboard API is available
+    if (!navigator.clipboard) {
+      showMessage('Clipboard sharing is not available in your browser. Please copy the link manually.', 'error');
+      return;
+    }
+    
     navigator.clipboard.writeText(url).then(() => {
       const originalText = button.textContent;
       button.textContent = '✓ Copied!';
@@ -932,7 +946,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }, 2000);
     }).catch(err => {
       console.error('Failed to copy link:', err);
-      showMessage('Failed to copy link', 'error');
+      showMessage('Failed to copy link to clipboard', 'error');
     });
   }
 
