@@ -923,7 +923,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const subject = encodeURIComponent(`Mergington High School Activity: ${activityName}`);
     const body = encodeURIComponent(`Check out this extracurricular activity at Mergington High School:\n\n${activityName}\n${description}\n\nSchedule: ${schedule}\n\nView details at: ${window.location.href}`);
     const mailtoUrl = `mailto:?subject=${subject}&body=${body}`;
-    window.location.href = mailtoUrl;
+    
+    // Use an anchor element to avoid navigating away from the page
+    const link = document.createElement('a');
+    link.href = mailtoUrl;
+    link.click();
   }
 
   function copyLinkToClipboard(button) {
