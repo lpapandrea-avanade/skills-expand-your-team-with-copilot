@@ -30,6 +30,10 @@
   --error-light: #ffebee;
   --info: #0c5460;
   --info-light: #d1ecf1;
+
+  /* Header overlay colors */
+  --header-overlay: rgba(255, 255, 255, 0.2);
+  --header-overlay-hover: rgba(255, 255, 255, 0.3);
 }
 
 /* Dark mode color palette */
@@ -64,6 +68,10 @@ body.dark-mode {
   --error-light: #b71c1c;
   --info: #2196f3;
   --info-light: #0d47a1;
+
+  /* Header overlay colors */
+  --header-overlay: rgba(255, 255, 255, 0.2);
+  --header-overlay-hover: rgba(255, 255, 255, 0.3);
 }
 
 * {
@@ -663,7 +671,7 @@ footer {
 
 /* Dark mode toggle button */
 #theme-toggle {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--header-overlay);
   border-radius: 20px;
   padding: 4px 12px;
   font-size: 0.85rem;
@@ -675,7 +683,7 @@ footer {
 }
 
 #theme-toggle:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: var(--header-overlay-hover);
 }
 
 .theme-icon {
@@ -697,7 +705,7 @@ footer {
   display: flex;
   align-items: center;
   gap: 5px;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--header-overlay);
   border-radius: 20px;
   padding: 4px 12px;
   font-size: 0.85rem;
@@ -705,7 +713,7 @@ footer {
 }
 
 .icon-button:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: var(--header-overlay-hover);
 }
 
 .user-icon {
@@ -714,11 +722,11 @@ footer {
 
 #logout-button {
   padding: 3px 10px;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--header-overlay);
   font-size: 0.8rem;
   border-radius: 20px;
 }
 
 #logout-button:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: var(--header-overlay-hover);
 }

@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Theme toggle elements
   const themeToggle = document.getElementById("theme-toggle");
   const themeIcon = themeToggle.querySelector(".theme-icon");
-  const themeText = themeToggle.querySelector("span:last-child");
+  const themeText = themeToggle.querySelector("span:nth-child(2)");
 
   // Initialize theme
   function initializeTheme() {
@@ -37,10 +37,12 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.classList.add("dark-mode");
       themeIcon.textContent = "☀️";
       themeText.textContent = "Light Mode";
+      themeToggle.setAttribute("aria-pressed", "true");
     } else {
       document.body.classList.remove("dark-mode");
       themeIcon.textContent = "🌙";
       themeText.textContent = "Dark Mode";
+      themeToggle.setAttribute("aria-pressed", "false");
     }
   }
 
@@ -52,10 +54,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isDarkMode) {
       themeIcon.textContent = "☀️";
       themeText.textContent = "Light Mode";
+      themeToggle.setAttribute("aria-pressed", "true");
       localStorage.setItem("theme", "dark");
     } else {
       themeIcon.textContent = "🌙";
       themeText.textContent = "Dark Mode";
+      themeToggle.setAttribute("aria-pressed", "false");
       localStorage.setItem("theme", "light");
     }
   }
