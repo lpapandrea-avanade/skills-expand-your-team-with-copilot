@@ -33,20 +33,31 @@ document.addEventListener("DOMContentLoaded", () => {
     const themeIcon = themeToggle.querySelector(".theme-icon");
     const themeText = themeToggle.querySelector(".theme-text");
 
-    // Initialize theme
-    function initializeTheme() {
-      const savedTheme = localStorage.getItem("theme");
-      if (savedTheme === "dark") {
-        document.body.classList.add("dark-mode");
+    // Update theme UI elements
+    function updateThemeUI(isDarkMode) {
+      if (isDarkMode) {
         if (themeIcon) themeIcon.textContent = "☀️";
         if (themeText) themeText.textContent = "Light Mode";
         themeToggle.setAttribute("aria-pressed", "true");
       } else {
-        document.body.classList.remove("dark-mode");
         if (themeIcon) themeIcon.textContent = "🌙";
         if (themeText) themeText.textContent = "Dark Mode";
         themeToggle.setAttribute("aria-pressed", "false");
       }
+    }
+
+    // Initialize theme
+    function initializeTheme() {
+      const savedTheme = localStorage.getItem("theme");
+      const isDarkMode = savedTheme === "dark";
+      
+      if (isDarkMode) {
+        document.body.classList.add("dark-mode");
+      } else {
+        document.body.classList.remove("dark-mode");
+      }
+      
+      updateThemeUI(isDarkMode);
     }
 
     // Toggle theme
@@ -54,17 +65,8 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.classList.toggle("dark-mode");
       const isDarkMode = document.body.classList.contains("dark-mode");
       
-      if (isDarkMode) {
-        if (themeIcon) themeIcon.textContent = "☀️";
-        if (themeText) themeText.textContent = "Light Mode";
-        themeToggle.setAttribute("aria-pressed", "true");
-        localStorage.setItem("theme", "dark");
-      } else {
-        if (themeIcon) themeIcon.textContent = "🌙";
-        if (themeText) themeText.textContent = "Dark Mode";
-        themeToggle.setAttribute("aria-pressed", "false");
-        localStorage.setItem("theme", "light");
-      }
+      updateThemeUI(isDarkMode);
+      localStorage.setItem("theme", isDarkMode ? "dark" : "light");
     }
 
     // Event listener for theme toggle
