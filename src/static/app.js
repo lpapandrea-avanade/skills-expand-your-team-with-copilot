@@ -552,6 +552,23 @@ document.addEventListener("DOMContentLoaded", () => {
             .join("")}
         </ul>
       </div>
+      <div class="share-container">
+        <div class="share-label">Share this activity:</div>
+        <div class="share-buttons">
+          <button class="share-button twitter" data-share="twitter" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}">
+            🐦 Twitter
+          </button>
+          <button class="share-button facebook" data-share="facebook" data-activity="${name}">
+            📘 Facebook
+          </button>
+          <button class="share-button email" data-share="email" data-activity="${name}" data-description="${details.description.replace(/"/g, '&quot;')}" data-schedule="${formattedSchedule.replace(/"/g, '&quot;')}">
+            📧 Email
+          </button>
+          <button class="share-button copy" data-share="copy">
+            🔗 Copy Link
+          </button>
+        </div>
+      </div>
       <div class="activity-card-actions">
         ${
           currentUser
@@ -575,6 +592,32 @@ document.addEventListener("DOMContentLoaded", () => {
     const deleteButtons = activityCard.querySelectorAll(".delete-participant");
     deleteButtons.forEach((button) => {
       button.addEventListener("click", handleUnregister);
+    });
+
+    // Add click handlers for share buttons
+    const shareButtons = activityCard.querySelectorAll(".share-button");
+    shareButtons.forEach((button) => {
+      button.addEventListener("click", (e) => {
+        const shareType = e.target.dataset.share;
+        const activityName = e.target.dataset.activity;
+        const description = e.target.dataset.description;
+        const schedule = e.target.dataset.schedule;
+
+        switch (shareType) {
+          case 'twitter':
+            shareOnTwitter(activityName, description);
+            break;
+          case 'facebook':
+            shareOnFacebook(activityName);
+            break;
+          case 'email':
+            shareViaEmail(activityName, description, schedule);
+            break;
+          case 'copy':
+            copyLinkToClipboard(e.target);
+            break;
+        }
+      });
     });
 
     // Add click handler for register button (only when authenticated)
@@ -854,6 +897,44 @@ document.addEventListener("DOMContentLoaded", () => {
       console.error("Error signing up:", error);
     }
   });
+
+  // Social sharing functions
+  function shareOnTwitter(activityName, description) {
+    const text = `Check out this activity at Mergington High School: ${activityName} - ${description}`;
+    const url = encodeURIComponent(window.location.href);
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${url}`;
+    window.open(twitterUrl, '_blank', 'width=550,height=420');
+  }
+
+  function shareOnFacebook(activityName) {
+    const url = encodeURIComponent(window.location.href);
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+    window.open(facebookUrl, '_blank', 'width=550,height=420');
+  }
+
+  function shareViaEmail(activityName, description, schedule) {
+    const subject = encodeURIComponent(`Check out this activity: ${activityName}`);
+    const body = encodeURIComponent(`I thought you might be interested in this activity at Mergington High School:\n\n${activityName}\n${description}\n\nSchedule: ${schedule}\n\nLearn more at: ${window.location.href}`);
+    const mailtoUrl = `mailto:?subject=${subject}&body=${body}`;
+    window.location.href = mailtoUrl;
+  }
+
+  function copyLinkToClipboard(button) {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      const originalText = button.textContent;
+      button.textContent = '✓ Copied!';
+      button.classList.add('copied');
+      
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.classList.remove('copied');
+      }, 2000);
+    }).catch(err => {
+      console.error('Failed to copy link:', err);
+      showMessage('Failed to copy link', 'error');
+    });
+  }
 
   // Expose filter functions to window for future UI control
   window.activityFilters = {
